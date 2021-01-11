@@ -1,9 +1,5 @@
 # Makefile
 TARGET=rsa
-PREFIX?=/usr/local
-INSTBINDIR=bin
-INSTMANDIR=share/man
-MANPAGENUMBER=1
 
 ODIR=obj
 SDIR=src
