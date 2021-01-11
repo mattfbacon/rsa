@@ -23,7 +23,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 #define RABIN_MILLER_TRIES 10
 
-#define randrange(a, b) get_random(b - a) + a; // [a, b), like python randrange
+#define randrange(a, b) (get_random(b - a) + a); // [a, b), like python randrange
 
 bool rabin_miller_check(unsigned int a, unsigned int s, unsigned int d, unsigned int n);
 bool rabin_miller(unsigned int n);
