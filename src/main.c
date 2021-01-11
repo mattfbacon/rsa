@@ -107,48 +107,4 @@ int main(int argc, char** argv) {
 	} else {
 		print_generic_usage_with_complaint("no action provided");
 	}
-	/*
-	switch (argc) {
-		case 1:
-			print_generic_usage_with_complaint("no action provided");
-			break;
-		case 2:
-			if (streq(argv[1], "keygen"))
-		case 3:
-		case 4:;
-			const bool are_encrypting = streq(argv[1], "encrypt");
-			if (are_encrypting || streq(argv[1], "decrypt")) { 
-				printf("rsa: not enough arguments for %1$s\nUsage:\n\t%1$s <key> <modulo> <%2$s>\n", argv[1], are_encrypting ? "plaintext" : "ciphertext");
-			} else {
-				print_generic_usage_with_complaint("unknown action");
-			}
-			exit(EXIT_USAGE_ERROR);
-		case 5:
-			bool are_encrypting = streq(argv[1], "encrypt");
-			if (are_encrypting || streq(argv[1], "decrypt")) {
-				bool use_stdin = streq(argv[4], "-");
-
-				bool valid;
-				unsigned long key = str_to_long_safe(argv[2], &valid);
-				if (!valid) {
-					char* key_complaint;
-					sprintf(key_complaint, "key must be unsigned long, got \"%s\"", argv[2]);
-					print_generic_usage_with_complaint(key_complaint);
-				}
-				unsigned long modulo = str_to_long_safe(argv[3], &valid);
-				if (!valid) {
-					char* mod_complaint;
-					sprintf(mod_complaint, "modulo must be unsigned long, got \"%s\"", argv[3]);
-					print_generic_usage_with_complaint(mod_complaint);
-				}
-
-
-			} else {
-				print_generic_usage_with_complaint("unknown action");
-			}
-			break;
-		default:
-			print_generic_usage_with_complaint("too many arguments");
-	}
-	*/
 }
