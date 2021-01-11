@@ -68,7 +68,8 @@ unsigned int gcd(unsigned int a, unsigned int b) {
 }
 
 unsigned int multiplicative_inverse(unsigned int a, unsigned int b) {
-	unsigned int x = 0, y = 1, lx = 1, ly = 0, oa = a, ob = b, q;
+	unsigned int x = 0, y = 1, oa = a, ob = b, q;
+	int lx = 1, ly = 0;
 	unsigned int temp;
 	while (b != 0) {
 		q = a / b; // floor div
