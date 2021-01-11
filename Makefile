@@ -20,3 +20,6 @@ $(ODIR)/%.o: $(SDIR)/%.c $(INCLUDES)
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(OUTDIR)/$@ $(SDIR)/main.c $(OBJS)
+
+clean:
+	rm $(OBJS)
