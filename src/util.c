@@ -173,7 +173,17 @@ void print_generic_usage_with_complaint(char* complaint) {
 	print_generic_usage();
 }
 void print_generic_usage() {
-	printf("Usage:\n  encrypt <key> <modulo> <plaintext>\n  decrypt <key> <modulo> <ciphertext>\n  keygen\nIf plaintext or ciphertext is \"-\", read from stdin.\n");
+	puts(
+		"commands:\n"
+			"  encrypt <key> <modulo> <plaintext>\n"
+			"  decrypt <key> <modulo> <ciphertext>\n"
+			"  keygen\n"
+			"if plaintext or ciphertext is \"-\", read from stdin.\n"
+		"options:\n"
+			"  -v, --verbose: print detailed progress info along with output\n"
+			"  -b, --brief: print only output in a human-friendy format (default)\n"
+			"  -q, --quiet: print only output in a consistent, machine-readable format."
+	);
 	exit(EXIT_USAGE_ERROR);
 }
 bool streq(char* str1, char* str2) {
