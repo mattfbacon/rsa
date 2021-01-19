@@ -157,7 +157,7 @@ void print_generic_usage_with_complaint_and_readback_short_option(char* complain
 	fputs(" '-", stdout);
 	putchar(option_name);
 	puts("'");
-	print_generic_usage();
+	print_generic_usage(true);
 }
 void print_generic_usage_with_complaint_and_readback_string(char* complaint, char* content) {
 	fputs("rsa: ", stdout);
@@ -165,26 +165,29 @@ void print_generic_usage_with_complaint_and_readback_string(char* complaint, cha
 	fputs(" '", stdout);
 	fputs(content, stdout);
 	puts("'");
-	print_generic_usage();
+	print_generic_usage(true);
 }
 void print_generic_usage_with_complaint(char* complaint) {
 	fputs("rsa: ", stdout);
 	puts(complaint);
-	print_generic_usage();
+	print_generic_usage(true);
 }
-void print_generic_usage() {
+void print_generic_usage(bool in_error) {
 	puts(
-		"commands:\n"
-			"  encrypt <key> <modulo> <plaintext>\n"
-			"  decrypt <key> <modulo> <ciphertext>\n"
-			"  keygen\n"
-			"if plaintext or ciphertext is \"-\", read from stdin.\n"
-		"options:\n"
-			"  -v, --verbose: print detailed progress info along with output\n"
-			"  -b, --brief: print only output in a human-friendy format (default)\n"
-			"  -q, --quiet: print only output in a consistent, machine-readable format."
+		"COMMANDS:\n"
+		"  encrypt <key> <modulo> <plaintext>\n"
+		"  decrypt <key> <modulo> <ciphertext>\n"
+		"  keygen\n"
+		"if plaintext or ciphertext is \"-\", read from stdin.\n"
+		"OPTIONS:\n"
+		"  -v, --verbose: print detailed progress info along with output.\n"
+		"  -b, --brief: print only output in a human-friendy format (default).\n"
+		"  -q, --quiet: print only output in a consistent, machine-readable format.\n"
+		"  -V, --version: print version info and exit.\n"
+		"  -h, --help, --usage: print usage and exit.\n"
+		"if multiple of -v, -b, and/or -q are provided, the last takes precedence."
 	);
-	exit(EXIT_USAGE_ERROR);
+	exit(in_error ? EXIT_USAGE_ERROR : EXIT_SUCCESS);
 }
 bool streq(char* str1, char* str2) {
 	return strcmp(str1, str2) == 0;

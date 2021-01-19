@@ -30,7 +30,9 @@ enum e_verbosity verbosity = DEFAULT;
 int main(int argc, char** argv) {
 	/* -v, --verbose : set verbosity to VERBOSE
 	   -b, --brief : set verbosity to DEFAULT (only useful after -v or -q)
-	   -q, --quiet : set verbosity to QUIET */
+	   -q, --quiet : set verbosity to QUIET
+	   -V, --version : print version and exit
+	   -h, --help, --usage : print usage and exit */
 	// ↓ stores pointers to the text arguments (as opposed to options)
 	char* text_args[5]; // max number of text args is (I believe) three, so five is plenty.
 	int text_arg_index = 0;
@@ -51,6 +53,8 @@ int main(int argc, char** argv) {
 					if (streq(this_arg, "verbose")) verbosity = VERBOSE;
 					else if (streq(this_arg, "brief")) verbosity = DEFAULT;
 					else if (streq(this_arg, "quiet")) verbosity = QUIET;
+					else if (streq(this_arg, "version")) { puts(VERSION_STRING); exit(0); }
+					else if (streq(this_arg, "help") || streq(this_arg, "usage")) print_generic_usage(false);
 					else print_generic_usage_with_complaint_and_readback_string("unrecognized option", this_arg - (2 * sizeof(char)));
 					continue; // redundant
 				}
@@ -65,7 +69,12 @@ int main(int argc, char** argv) {
 						case 'v': verbosity = VERBOSE; break;
 						case 'b': verbosity = DEFAULT; break;
 						case 'q': verbosity = QUIET; break;
-						default: print_generic_usage_with_complaint_and_readback_short_option("unrecognized option", this_arg[0]);
+						case 'V': puts(VERSION_STRING); exit(0);
+						#pragma GCC diagnostic push
+						#pragma GCC diagnostic ignored "-Wimplicit-fallthrough="
+						case 'h': print_generic_usage(false); // exits
+						#pragma GCC diagnostic pop
+						default: print_generic_usage_with_complaint_and_readback_short_option("unrecognized option", this_arg[0]); // exits
 					}
 				}
 			}
