@@ -91,45 +91,63 @@ int main(int argc, char** argv) {
 		if (streq(text_args[0], "keygen")) {
 			struct KeygenResult result;
 			rsa_keygen(&result);
-			printf("public key: %u\nprivate key: %u\nmodulus: %u\n", result.public, result.private, result.modulo);
+			printf(verbosity == QUIET ? "%u\n%u\n%u\n" : "public key: %u\nprivate key: %u\nmodulus: %u\n", result.public, result.private, result.modulo);
 		} else {
 			bool are_encrypting = streq(text_args[0], "encrypt");
 			if (are_encrypting || streq(text_args[0], "decrypt")) {
+				verbose_log("encrypting or decrypting\n");
 				if (text_arg_index < 4) {
 					print_generic_usage_with_complaint_and_readback_string("not enough arguments to", text_args[0]);
 				}
 				unsigned int key;
 				if(!str_to_uint_safe(text_args[1], &key))
 					print_generic_usage_with_complaint("key must be unsigned int");
+				verbose_logf("got key %u\n", key);
 
 				unsigned int mod;
 				if(!str_to_uint_safe(text_args[2], &mod))
 					print_generic_usage_with_complaint("modulus must be unsigned int");
+				verbose_logf("got modulus %u\n", mod);
 
 				bool from_stdin = streq(text_args[3], "-");
 				if (are_encrypting) {
+					verbose_log("encrypting ");
 					if (from_stdin) {
+						verbose_log("from stdin\n");
 						int first, second = getchar();
-						if (second == EOF) exit(EXIT_EOF_INPUT); // got no input
+						if (second == EOF) {
+							verbose_log("got no input\n");
+							exit(EXIT_EOF_INPUT); // got no input
+						}
+						verbose_logf("got character %c\n", second);
 						while (second != EOF) {
 							first = second;
 							second = getchar();
+							verbose_logf("got character %c\n", second);
 							printf("%u", rsa_encrypt((char)first, key, mod));
 							if (second != EOF) putchar(' ');
 						}
+						verbose_log("got eof\n");
 					} else {
+						verbose_log("from argv\n");
 						for (char* current_char_ptr = text_args[3]; *current_char_ptr != 0; current_char_ptr += sizeof(char)) {
 							printf("%u ", rsa_encrypt(*current_char_ptr, key, mod));
 						}
+						verbose_log("adding trailing newline\n");
 						printf("%u", rsa_encrypt('\n', key, mod)); // add a trailing newline when receiving plaintext as an argument.
 					}
 					putchar('\n'); // customary newline on output
 					exit(EXIT_SUCCESS);
 				} else { // decrypting
+					verbose_log("decrypting ");
 					if (from_stdin) {
+						verbose_log("from stdin\n");
 						unsigned int parsed;
 						int scan_result = scanf("%u", &parsed);
-						if (scan_result == EOF) exit(EXIT_EOF_INPUT);
+						if (scan_result == EOF) {
+							verbose_log("got no input\n");
+							exit(EXIT_EOF_INPUT);
+						}
 						while (scan_result != EOF) {
 							if (scan_result == 0) {
 								print_generic_usage_with_complaint("got invalid ciphertext number, i.e., was not a number");
@@ -142,6 +160,7 @@ int main(int argc, char** argv) {
 							scan_result = scanf("%u", &parsed);
 						}
 					} else {
+						verbose_log("from argv\n");
 						unsigned int parsed;
 						char* end_ptr = text_args[3] + sizeof(char) * strlen(text_args[3]);
 						int chars_consumed;

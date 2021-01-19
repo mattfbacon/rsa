@@ -54,11 +54,14 @@ unsigned int get_random(unsigned int max) {
 
 	fclose(f);
 
+	verbose_logf("got random %u (mod %u for final result)\n", r, max);
+
 	return r % max;
 }
 
 unsigned int gcd(unsigned int a, unsigned int b) {
 	unsigned int temp;
+	verbose_logf("getting gcd of %u and %u\n", a, b);
 	while (b != 0) {
 		temp = a;
 		a = b;
@@ -68,6 +71,7 @@ unsigned int gcd(unsigned int a, unsigned int b) {
 }
 
 unsigned int multiplicative_inverse(unsigned int a, unsigned int b) {
+	verbose_logf("getting multiplicative inverse of %u and %u\n", a, b);
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wsign-conversion"
 	unsigned int x = 0, y = 1, oa = a, ob = b, q;
@@ -92,6 +96,7 @@ unsigned int multiplicative_inverse(unsigned int a, unsigned int b) {
 }
 
 bool rabin_miller_check(unsigned int base, unsigned int limit, unsigned int exp, unsigned int modulus) {
+	verbose_logf("rabin miller check with base %u, limit %u, exponent %u, and modulus %u\n", base, limit, exp, modulus);
 	base = mod_pow(base, exp, modulus);
 	if (base == 1) return true;
 	for (unsigned int i = 1; i < limit - 1; i++) {
@@ -102,6 +107,7 @@ bool rabin_miller_check(unsigned int base, unsigned int limit, unsigned int exp,
 }
 
 bool rabin_miller(unsigned int n) {
+	verbose_logf("rabin miller with %u\n", n);
 	if (n == 2) return true;
 	if (n % 2 == 0) return false;
 
@@ -115,6 +121,7 @@ bool rabin_miller(unsigned int n) {
 	}
 
 	for (unsigned int i = 1; i < RABIN_MILLER_TRIES; i++) {
+		verbose_logf("  iterate: ");
 		base = randrange(2, n - 1);
 		if(!rabin_miller_check(base, limit, exp, n)) return false;
 	}
@@ -123,6 +130,7 @@ bool rabin_miller(unsigned int n) {
 
 bool is_prime(unsigned int n) {
 	// will always properly identify composites, but sometimes considers primes composites. Fine for our use case.
+	verbose_logf("checking if %u is prime\n", n);
 	if (n >= 3) {
 		if (n % 2 == 1) {
 			unsigned int p;
@@ -138,6 +146,7 @@ bool is_prime(unsigned int n) {
 }
 
 unsigned int mod_pow(unsigned long base, unsigned int exp, unsigned int mod) {
+	verbose_logf("modular exponentiation: %lu^%u mod %u\n", base, exp, mod);
 	if (mod == 1) return 0;
 	unsigned long result = 1;
 	base = base % mod;
