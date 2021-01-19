@@ -51,12 +51,12 @@ int main(int argc, char** argv) {
 				bool from_stdin = streq(argv[4], "-");
 				if (are_encrypting) {
 					if (from_stdin) {
-						char first, second = getchar();
+						int first, second = getchar();
 						if (second == EOF) exit(EXIT_EOF_INPUT); // got no input
 						while (second != EOF) {
 							first = second;
 							second = getchar();
-							printf("%u", rsa_encrypt(first, key, mod));
+							printf("%u", rsa_encrypt((char)first, key, mod));
 							if (second != EOF) putchar(' ');
 						}
 					} else {

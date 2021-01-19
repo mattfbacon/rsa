@@ -68,6 +68,8 @@ unsigned int gcd(unsigned int a, unsigned int b) {
 }
 
 unsigned int multiplicative_inverse(unsigned int a, unsigned int b) {
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wsign-conversion"
 	unsigned int x = 0, y = 1, oa = a, ob = b, q;
 	int lx = 1, ly = 0;
 	unsigned int temp;
@@ -86,6 +88,7 @@ unsigned int multiplicative_inverse(unsigned int a, unsigned int b) {
 	if (lx < 0) lx += ob;
 	if (ly < 0) ly += oa;
 	return lx; // where ia + jb = gdb(a, b), return i.
+	#pragma GCC diagnostic pop
 }
 
 bool rabin_miller_check(unsigned int base, unsigned int limit, unsigned int exp, unsigned int modulus) {

@@ -10,7 +10,7 @@ INCLUDES=$(wildcard $(IDIR)/*.h)
 
 LIBS=m
 CC=gcc
-CFLAGS=-O2 -Wall -Wextra -pedantic -I$(IDIR) -l$(LIBS)
+CFLAGS=-O2 -Wall -Wextra -Wconversion -pedantic -I$(IDIR) -l$(LIBS)
 
 _OBJS=util.o rsa.o
 OBJS=$(patsubst %,$(ODIR)/%,$(_OBJS))
