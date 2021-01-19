@@ -152,28 +152,29 @@ unsigned int mod_pow(unsigned long base, unsigned int exp, unsigned int mod) {
 }
 
 void print_generic_usage_with_complaint_and_readback_short_option(char* complaint, char option_name) {
-	fputs("rsa: ", stdout);
-	fputs(complaint, stdout);
-	fputs(" '-", stdout);
-	putchar(option_name);
-	puts("'");
+	fputs("rsa: ", stderr);
+	fputs(complaint, stderr);
+	fputs(" '-", stderr);
+	putc(option_name, stderr);
+	fputs("'\n", stderr);
 	print_generic_usage(true);
 }
 void print_generic_usage_with_complaint_and_readback_string(char* complaint, char* content) {
-	fputs("rsa: ", stdout);
-	fputs(complaint, stdout);
-	fputs(" '", stdout);
-	fputs(content, stdout);
-	puts("'");
+	fputs("rsa: ", stderr);
+	fputs(complaint, stderr);
+	fputs(" '", stderr);
+	fputs(content, stderr);
+	fputs("'\n", stderr);
 	print_generic_usage(true);
 }
 void print_generic_usage_with_complaint(char* complaint) {
-	fputs("rsa: ", stdout);
-	puts(complaint);
+	fputs("rsa: ", stderr);
+	fputs(complaint, stderr);
+	putc('\n', stderr);
 	print_generic_usage(true);
 }
 void print_generic_usage(bool in_error) {
-	puts(
+	fputs(
 		"COMMANDS:\n"
 		"  encrypt <key> <modulo> <plaintext>\n"
 		"  decrypt <key> <modulo> <ciphertext>\n"
@@ -185,7 +186,8 @@ void print_generic_usage(bool in_error) {
 		"  -q, --quiet: print only output in a consistent, machine-readable format.\n"
 		"  -V, --version: print version info and exit.\n"
 		"  -h, --help, --usage: print usage and exit.\n"
-		"if multiple of -v, -b, and/or -q are provided, the last takes precedence."
+		"if multiple of -v, -b, and/or -q are provided, the last takes precedence.",
+		in_error ? stderr : stdout
 	);
 	exit(in_error ? EXIT_USAGE_ERROR : EXIT_SUCCESS);
 }
