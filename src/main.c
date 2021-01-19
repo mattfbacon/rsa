@@ -25,30 +25,79 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 #include "rsa.h"
 #include "main.h"
 
+enum e_verbosity verbosity = DEFAULT;
+
 int main(int argc, char** argv) {
-	if (argc >= 1 + 1) {
-		if (streq(argv[1], "keygen")) {
+	/* -v, --verbose : set verbosity to VERBOSE
+	   -b, --brief : set verbosity to DEFAULT (only useful after -v or -q)
+	   -q, --quiet : set verbosity to QUIET */
+	// ↓ stores pointers to the text arguments (as opposed to options)
+	char* text_args[5]; // max number of text args is (I believe) three, so five is plenty.
+	int text_arg_index = 0;
+	for (int arg_pos = 1; arg_pos < argc; arg_pos++) {
+		char* this_arg = argv[arg_pos];
+		if (this_arg[0] == '-') { // starts with -, short or long option (or just - or --)
+			if (this_arg[1] == '-') { // starts with --, long option (or just --)
+				if (this_arg[2] == '\0') { // just --, disqualifies anything following as an argument
+					arg_pos++; // exclude this argument
+					// copy item-by-item to text_args the following arguments until end of argc
+					// if there are too many arguments to fit into text_args, ignore them because there are too many anyway (max 3).
+					for (int i = text_arg_index; arg_pos < argc && i < 5; i++, arg_pos++) {
+						text_args[i] = argv[arg_pos];
+					}
+					break;
+				} else { // long option
+					this_arg += 2 * sizeof(char); // exclude -- prefix
+					if (streq(this_arg, "verbose")) verbosity = VERBOSE;
+					else if (streq(this_arg, "brief")) verbosity = DEFAULT;
+					else if (streq(this_arg, "quiet")) verbosity = QUIET;
+					else print_generic_usage_with_complaint_and_readback_string("unrecognized option", this_arg - (2 * sizeof(char)));
+					continue; // redundant
+				}
+			} else if (this_arg[1] == '\0') { // just -, not actually an option
+				text_args[text_arg_index] = this_arg;
+				text_arg_index++;
+				continue;
+			} else { // short option(s)
+				this_arg += sizeof(char); // exclude - prefix
+				for(; this_arg[0] != '\0'; this_arg += sizeof(char)) { // process while this_arg still has characters
+					switch (this_arg[0]) {
+						case 'v': verbosity = VERBOSE; break;
+						case 'b': verbosity = DEFAULT; break;
+						case 'q': verbosity = QUIET; break;
+						default: print_generic_usage_with_complaint_and_readback_short_option("unrecognized option", this_arg[0]);
+					}
+				}
+			}
+		} else { // normal argument
+		if (text_arg_index == 5) continue; // ignore extra arguments
+			text_args[text_arg_index] = this_arg;
+			text_arg_index++;
+			continue; // redundant
+		}
+	}
+	if (text_arg_index == 0) {
+		print_generic_usage_with_complaint("no action provided");
+	} else {
+		if (streq(text_args[0], "keygen")) {
 			struct KeygenResult result;
 			rsa_keygen(&result);
 			printf("public key: %u\nprivate key: %u\nmodulus: %u\n", result.public, result.private, result.modulo);
 		} else {
-			bool are_encrypting = streq(argv[1], "encrypt");
-			if (are_encrypting || streq(argv[1], "decrypt")) {
-				if (argc < 4 + 1) {
-					fputs("rsa: not enough arguments for \"", stdout);
-					fputs(argv[1], stdout);
-					puts("\"");
-					print_generic_usage();
+			bool are_encrypting = streq(text_args[0], "encrypt");
+			if (are_encrypting || streq(text_args[0], "decrypt")) {
+				if (text_arg_index < 4) {
+					print_generic_usage_with_complaint_and_readback_string("not enough arguments to", text_args[0]);
 				}
 				unsigned int key;
-				if(!str_to_uint_safe(argv[2], &key))
+				if(!str_to_uint_safe(text_args[1], &key))
 					print_generic_usage_with_complaint("key must be unsigned int");
 
 				unsigned int mod;
-				if(!str_to_uint_safe(argv[3], &mod))
+				if(!str_to_uint_safe(text_args[2], &mod))
 					print_generic_usage_with_complaint("modulus must be unsigned int");
 
-				bool from_stdin = streq(argv[4], "-");
+				bool from_stdin = streq(text_args[3], "-");
 				if (are_encrypting) {
 					if (from_stdin) {
 						int first, second = getchar();
@@ -60,7 +109,7 @@ int main(int argc, char** argv) {
 							if (second != EOF) putchar(' ');
 						}
 					} else {
-						for (char* current_char_ptr = argv[4]; *current_char_ptr != 0; current_char_ptr += sizeof(char)) {
+						for (char* current_char_ptr = text_args[3]; *current_char_ptr != 0; current_char_ptr += sizeof(char)) {
 							printf("%u ", rsa_encrypt(*current_char_ptr, key, mod));
 						}
 						printf("%u", rsa_encrypt('\n', key, mod)); // add a trailing newline when receiving plaintext as an argument.
@@ -74,8 +123,7 @@ int main(int argc, char** argv) {
 						if (scan_result == EOF) exit(EXIT_EOF_INPUT);
 						while (scan_result != EOF) {
 							if (scan_result == 0) {
-								puts("rsa: got invalid ciphertext number, i.e. was not a number");
-								exit(EXIT_USAGE_ERROR);
+								print_generic_usage_with_complaint("got invalid ciphertext number, i.e., was not a number");
 							}
 							if (scan_result == -1) {
 								perror("OS error");
@@ -86,25 +134,19 @@ int main(int argc, char** argv) {
 						}
 					} else {
 						unsigned int parsed;
-						char* end_ptr = argv[4] + sizeof(char) * strlen(argv[4]);
+						char* end_ptr = text_args[3] + sizeof(char) * strlen(text_args[3]);
 						int chars_consumed;
-						for (char* current_char_ptr = argv[4]; current_char_ptr < end_ptr; current_char_ptr += chars_consumed) {
+						for (char* current_char_ptr = text_args[3]; current_char_ptr < end_ptr; current_char_ptr += chars_consumed) {
 							if (sscanf(current_char_ptr, "%u%n", &parsed, &chars_consumed) == 0) {
-								puts("rsa: got invalid ciphertext number, i.e. was not a number");
-								exit(EXIT_USAGE_ERROR);
+								print_generic_usage_with_complaint("got invalid ciphertext number, i.e., was not a number");
 							}
 							putchar(rsa_decrypt(parsed, key, mod));
 						}
 					}
 				}
 			} else {
-				fputs("rsa: unknown action \"", stdout);
-				fputs(argv[1], stdout);
-				puts("\"");
-				print_generic_usage();
+				print_generic_usage_with_complaint_and_readback_string("unknown action", text_args[0]);
 			}
 		}
-	} else {
-		print_generic_usage_with_complaint("no action provided");
 	}
 }

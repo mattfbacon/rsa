@@ -33,6 +33,8 @@ unsigned int multiplicative_inverse(unsigned int a, unsigned int b);
 
 unsigned int mod_pow(unsigned long base, unsigned int exp, unsigned int mod);
 unsigned int get_random(unsigned int max);
+void print_generic_usage_with_complaint_and_readback_short_option(char* complaint, char option_name);
+void print_generic_usage_with_complaint_and_readback_string(char* complaint, char* content);
 void print_generic_usage_with_complaint(char* complaint);
 void print_generic_usage();
 bool streq(char* str1, char* str2);

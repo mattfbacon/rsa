@@ -23,4 +23,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 #define EXIT_INTERNAL_ERROR 1
 #define EXIT_EOF_INPUT 0
 
+enum e_verbosity {
+	VERBOSE,
+	DEFAULT,
+	QUIET
+};
+
+extern enum e_verbosity verbosity;
+
 #endif

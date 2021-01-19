@@ -151,6 +151,22 @@ unsigned int mod_pow(unsigned long base, unsigned int exp, unsigned int mod) {
 	return (unsigned int)result;
 }
 
+void print_generic_usage_with_complaint_and_readback_short_option(char* complaint, char option_name) {
+	fputs("rsa: ", stdout);
+	fputs(complaint, stdout);
+	fputs(" '-", stdout);
+	putchar(option_name);
+	puts("'");
+	print_generic_usage();
+}
+void print_generic_usage_with_complaint_and_readback_string(char* complaint, char* content) {
+	fputs("rsa: ", stdout);
+	fputs(complaint, stdout);
+	fputs(" '", stdout);
+	fputs(content, stdout);
+	puts("'");
+	print_generic_usage();
+}
 void print_generic_usage_with_complaint(char* complaint) {
 	fputs("rsa: ", stdout);
 	puts(complaint);
