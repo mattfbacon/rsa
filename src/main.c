@@ -36,6 +36,7 @@ int main(int argc, char** argv) {
 	// ↓ stores pointers to the text arguments (as opposed to options)
 	char* text_args[5]; // max number of text args is (I believe) three, so five is plenty.
 	int text_arg_index = 0;
+	bool wants_help = false;
 	for (int arg_pos = 1; arg_pos < argc; arg_pos++) {
 		char* this_arg = argv[arg_pos];
 		if (this_arg[0] == '-') { // starts with -, short or long option (or just - or --)
@@ -54,7 +55,7 @@ int main(int argc, char** argv) {
 					else if (streq(this_arg, "brief")) verbosity = DEFAULT;
 					else if (streq(this_arg, "quiet")) verbosity = QUIET;
 					else if (streq(this_arg, "version")) { puts(VERSION_STRING); exit(0); }
-					else if (streq(this_arg, "help") || streq(this_arg, "usage")) print_generic_usage(false);
+					else if (streq(this_arg, "help") || streq(this_arg, "usage")) wants_help = true;
 					else print_generic_usage_with_complaint_and_readback_string("unrecognized option", this_arg - (2 * sizeof(char)));
 					continue; // redundant
 				}
@@ -70,10 +71,7 @@ int main(int argc, char** argv) {
 						case 'b': verbosity = DEFAULT; break;
 						case 'q': verbosity = QUIET; break;
 						case 'V': puts(VERSION_STRING); exit(0);
-						#pragma GCC diagnostic push
-						#pragma GCC diagnostic ignored "-Wimplicit-fallthrough="
-						case 'h': print_generic_usage(false); // exits
-						#pragma GCC diagnostic pop
+						case 'h': wants_help = true; break;
 						default: print_generic_usage_with_complaint_and_readback_short_option("unrecognized option", this_arg[0]); // exits
 					}
 				}
@@ -89,24 +87,26 @@ int main(int argc, char** argv) {
 		print_generic_usage_with_complaint("no action provided");
 	} else {
 		if (streq(text_args[0], "keygen")) {
+			if (__builtin_expect(wants_help, 0)) print_specific_usage(KEYGEN, false);
 			struct KeygenResult result;
 			rsa_keygen(&result);
 			printf(verbosity == QUIET ? "%u\n%u\n%u\n" : "public key: %u\nprivate key: %u\nmodulus: %u\n", result.public, result.private, result.modulo);
 		} else {
 			bool are_encrypting = streq(text_args[0], "encrypt");
 			if (are_encrypting || streq(text_args[0], "decrypt")) {
+				if (__builtin_expect(wants_help, 0)) print_specific_usage(are_encrypting ? ENCRYPT : DECRYPT, false);
 				verbose_log("encrypting or decrypting\n");
 				if (text_arg_index < 4) {
-					print_generic_usage_with_complaint_and_readback_string("not enough arguments to", text_args[0]);
+					print_specific_usage(are_encrypting ? ENCRYPT : DECRYPT, true);
 				}
 				unsigned int key;
 				if(!str_to_uint_safe(text_args[1], &key))
-					print_generic_usage_with_complaint("key must be unsigned int");
+					print_specific_usage(are_encrypting ? ENCRYPT : DECRYPT, true);
 				verbose_logf("got key %u\n", key);
 
 				unsigned int mod;
 				if(!str_to_uint_safe(text_args[2], &mod))
-					print_generic_usage_with_complaint("modulus must be unsigned int");
+					print_specific_usage(are_encrypting ? ENCRYPT : DECRYPT, true);
 				verbose_logf("got modulus %u\n", mod);
 
 				bool from_stdin = streq(text_args[3], "-");
@@ -150,7 +150,8 @@ int main(int argc, char** argv) {
 						}
 						while (scan_result != EOF) {
 							if (scan_result == 0) {
-								print_generic_usage_with_complaint("got invalid ciphertext number, i.e., was not a number");
+								fputs("got invalid ciphertext number, i.e., was not a number\n", stderr);
+								print_specific_usage(DECRYPT, true);
 							}
 							if (scan_result == -1) {
 								perror("OS error");
@@ -166,7 +167,8 @@ int main(int argc, char** argv) {
 						int chars_consumed;
 						for (char* current_char_ptr = text_args[3]; current_char_ptr < end_ptr; current_char_ptr += chars_consumed) {
 							if (sscanf(current_char_ptr, "%u%n", &parsed, &chars_consumed) == 0) {
-								print_generic_usage_with_complaint("got invalid ciphertext number, i.e., was not a number");
+								fputs("got invalid ciphertext number, i.e., was not a number\n", stderr);
+								print_specific_usage(DECRYPT, true);
 							}
 							putchar(rsa_decrypt(parsed, key, mod));
 						}
