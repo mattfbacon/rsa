@@ -185,10 +185,10 @@ void print_generic_usage_with_complaint(char* complaint) {
 void print_generic_usage(bool in_error) {
 	fputs(
 		"COMMANDS:\n"
-		"  encrypt <key> <modulo> <plaintext>\n"
-		"  decrypt <key> <modulo> <ciphertext>\n"
+		"  encrypt <key> <modulus> <plaintext>\n"
+		"  decrypt <key> <modulus> <ciphertext>\n"
 		"  keygen\n"
-		"if plaintext or ciphertext is \"-\", read from stdin.\n"
+		"if plaintext or ciphertext is '-', read from stdin.\n"
 		"OPTIONS:\n"
 		"  -v, --verbose: print detailed progress info along with output.\n"
 		"  -b, --brief: print only output in a human-friendy format (default).\n"
