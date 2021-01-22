@@ -195,7 +195,7 @@ void print_generic_usage(bool in_error) {
 		"  -q, --quiet: print only output in a consistent, machine-readable format.\n"
 		"  -V, --version: print version info and exit.\n"
 		"  -h, --help, --usage: print usage and exit.\n"
-		"if multiple of -v, -b, and/or -q are provided, the last takes precedence.",
+		"if multiple of -v, -b, and/or -q are provided, the last takes precedence.\n",
 		in_error ? stderr : stdout
 	);
 	exit(in_error ? EXIT_USAGE_ERROR : EXIT_SUCCESS);
