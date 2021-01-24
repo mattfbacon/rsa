@@ -26,7 +26,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 #include "rsa.h"
 #include "main.h"
 
-static unsigned short low_primes[] = {
+static const unsigned short low_primes[] = {
 	3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,
 	97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,
 	179,181,191,193,197,199,211,223,227,229,233,239,241,251,257,263,
@@ -39,14 +39,13 @@ static unsigned short low_primes[] = {
 	883,887,907,911,919,929,937,941,947,953,967,971,977,983,991,997
 };
 
-static unsigned char num_low_primes = 167;
+static const unsigned char num_low_primes = 167;
 
-unsigned int get_random(unsigned int max) {
+unsigned int get_random(const unsigned int max) {
 	const unsigned int limit = UINT_MAX - (UINT_MAX % max);
 	unsigned int r;
 
-	FILE *f;
-	f = fopen("/dev/random", "r");
+	FILE* f = fopen("/dev/random", "r");
 
 	do {
 		fread(&r, sizeof(r), 1, f);
@@ -60,9 +59,9 @@ unsigned int get_random(unsigned int max) {
 }
 
 unsigned int gcd(unsigned int a, unsigned int b) {
-	unsigned int temp;
 	verbose_logf("getting gcd of %u and %u\n", a, b);
 	while (b != 0) {
+		unsigned int temp;
 		temp = a;
 		a = b;
 		b = temp % b;
@@ -74,11 +73,11 @@ unsigned int multiplicative_inverse(unsigned int a, unsigned int b) {
 	verbose_logf("getting multiplicative inverse of %u and %u\n", a, b);
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wsign-conversion"
-	unsigned int x = 0, y = 1, oa = a, ob = b, q;
+	unsigned int x = 0, y = 1, oa = a, ob = b;
 	int lx = 1, ly = 0;
-	unsigned int temp;
 	while (b != 0) {
-		q = a / b; // floor div
+		unsigned int temp;
+		const unsigned int q = a / b; // floor div
 		temp = a;
 		a = b;
 		b = temp % b;
@@ -95,7 +94,7 @@ unsigned int multiplicative_inverse(unsigned int a, unsigned int b) {
 	#pragma GCC diagnostic pop
 }
 
-bool rabin_miller_check(unsigned int base, unsigned int limit, unsigned int exp, unsigned int modulus) {
+bool rabin_miller_check(unsigned int base, const unsigned int limit, const unsigned int exp, const unsigned int modulus) {
 	verbose_logf("rabin miller check with base %u, limit %u, exponent %u, and modulus %u\n", base, limit, exp, modulus);
 	base = mod_pow(base, exp, modulus);
 	if (base == 1) return true;
@@ -106,46 +105,43 @@ bool rabin_miller_check(unsigned int base, unsigned int limit, unsigned int exp,
 	return base == modulus - 1;
 }
 
-bool rabin_miller(unsigned int n) {
+bool rabin_miller(const unsigned int n) {
 	verbose_logf("rabin miller with %u\n", n);
 	if (n == 2) return true;
 	if (n % 2 == 0) return false;
 
 	unsigned int limit = 0;
 	unsigned int exp = n - 1;
-	unsigned int base;
 
 	while (exp % 2 == 0) {
-		exp >>= 1;
+		exp /= 2;
 		limit += 1;
 	}
 
 	for (unsigned int i = 1; i < RABIN_MILLER_TRIES; i++) {
 		verbose_logf("  iterate: ");
-		base = randrange(2, n - 1);
+		const unsigned int base = randrange(2, n - 1);
 		if(!rabin_miller_check(base, limit, exp, n)) return false;
 	}
 	return true;
 }
 
-bool is_prime(unsigned int n) {
+bool is_prime(const unsigned int n) {
 	// will always properly identify composites, but sometimes considers primes composites. Fine for our use case.
 	verbose_logf("checking if %u is prime\n", n);
-	if (n >= 3) {
-		if (n % 2 == 1) {
+	if (n >= 3 && n % 2 == 1) {
+		for (int i = 0; i < num_low_primes; i++) {
 			unsigned int p;
-			for (unsigned char i = 0; i < num_low_primes; i++) {
-				p = low_primes[i];
-				if (n == p) return true;
-				if (n % p == 0) return false;
-			}
-			return rabin_miller(n);
+			p = low_primes[i];
+			if (n == p) return true;
+			if (n % p == 0) return false;
 		}
+		return rabin_miller(n);
 	}
 	return false;
 }
 
-unsigned int mod_pow(unsigned long base, unsigned int exp, unsigned int mod) {
+unsigned int mod_pow(unsigned long base, unsigned int exp, const unsigned int mod) {
 	verbose_logf("modular exponentiation: %lu^%u mod %u\n", base, exp, mod);
 	if (mod == 1) return 0;
 	unsigned long result = 1;
@@ -154,13 +150,13 @@ unsigned int mod_pow(unsigned long base, unsigned int exp, unsigned int mod) {
 		if (exp % 2 == 1) {
 			result = (result * base) % mod;
 		}
-		exp = exp >> 1;
-		base = (base*base) % mod;
+		exp /= 2;
+		base = (base * base) % mod;
 	}
 	return (unsigned int)result;
 }
 
-void print_generic_usage_with_complaint_and_readback_short_option(char* complaint, char option_name) {
+void print_generic_usage_with_complaint_and_readback_short_option(immutable_string_t complaint, const char option_name) {
 	fputs("rsa: ", stderr);
 	fputs(complaint, stderr);
 	fputs(" '-", stderr);
@@ -168,7 +164,7 @@ void print_generic_usage_with_complaint_and_readback_short_option(char* complain
 	fputs("'\n", stderr);
 	print_generic_usage(true);
 }
-void print_generic_usage_with_complaint_and_readback_string(char* complaint, char* content) {
+void print_generic_usage_with_complaint_and_readback_string(immutable_string_t complaint, immutable_string_t content) {
 	fputs("rsa: ", stderr);
 	fputs(complaint, stderr);
 	fputs(" '", stderr);
@@ -176,13 +172,13 @@ void print_generic_usage_with_complaint_and_readback_string(char* complaint, cha
 	fputs("'\n", stderr);
 	print_generic_usage(true);
 }
-void print_generic_usage_with_complaint(char* complaint) {
+void print_generic_usage_with_complaint(immutable_string_t complaint) {
 	fputs("rsa: ", stderr);
 	fputs(complaint, stderr);
 	putc('\n', stderr);
 	print_generic_usage(true);
 }
-void print_generic_usage(bool in_error) {
+void print_generic_usage(const bool in_error) {
 	fputs(
 		"COMMANDS:\n"
 		"  encrypt <key> <modulus> <plaintext>\n"
@@ -202,7 +198,7 @@ void print_generic_usage(bool in_error) {
 	);
 	exit(in_error ? EXIT_USAGE_ERROR : EXIT_SUCCESS);
 }
-void print_specific_usage(enum e_command command, bool in_error) {
+void print_specific_usage(const enum e_command command, const bool in_error) {
 	switch(command) {
 		case ENCRYPT:
 			fputs(
@@ -245,27 +241,25 @@ void print_specific_usage(enum e_command command, bool in_error) {
 	}
 	exit(in_error ? EXIT_USAGE_ERROR : EXIT_SUCCESS);
 }
-bool streq(char* str1, char* str2) {
+bool streq(immutable_string_t str1, immutable_string_t str2) {
 	return strcmp(str1, str2) == 0;
 }
-bool strstartswith(char* str, char* pre) {
-	while(*pre != '\0') { // prefix still has chars
+bool strstartswith(const char* str, const char* pre) {
+	for(; *pre != '\0'; pre += sizeof(char), str += sizeof(char)) { // prefix still has chars
 		if(*pre != *str) return false;
-		pre += sizeof(char);
-		str += sizeof(char);
 	}
 	return true;
 }
-bool str_to_uint_safe(char* str, unsigned int* out) {
+bool str_to_uint_safe(immutable_string_t str, unsigned int* const out) {
 	char* nonnumber_chars;
-	unsigned long result = strtoul(str, &nonnumber_chars, 0);
+	const unsigned long result = strtoul(str, &nonnumber_chars, 0);
 	if (result > UINT_MAX) return false; // number won't fit in uint.
 	if (strlen(nonnumber_chars) != 0) return false; // if there are extraneous characters, the number was invalid.
 	*out = (unsigned int)result;
 	return true;
 }
 
-void str_scanf_escape(char* str, char* out) { // out should be 2x strlen of str, to be safe
+void str_scanf_escape(const char* str, char* out) { // out should be 2x strlen of str, to be safe
 	for (size_t i = 0; *str != '\0'; str += sizeof(char), i++) {
 		out[i] = *str;
 		if (*str == '%') out[++i] = '%';

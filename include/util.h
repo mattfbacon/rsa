@@ -25,9 +25,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 #define randrange(a, b) (get_random(b - a) + a); // [a, b), like python randrange
 
-bool rabin_miller_check(unsigned int a, unsigned int s, unsigned int d, unsigned int n);
-bool rabin_miller(unsigned int n);
-bool is_prime(unsigned int n);
+unsigned int get_random(const unsigned int max);
+
+bool is_prime(const unsigned int n);
 unsigned int gcd(unsigned int a, unsigned int b);
 unsigned int multiplicative_inverse(unsigned int a, unsigned int b);
 
@@ -37,17 +37,19 @@ enum e_command {
 	KEYGEN
 };
 
-unsigned int mod_pow(unsigned long base, unsigned int exp, unsigned int mod);
-unsigned int get_random(unsigned int max);
-void print_generic_usage_with_complaint_and_readback_short_option(char* complaint, char option_name);
-void print_generic_usage_with_complaint_and_readback_string(char* complaint, char* content);
-void print_generic_usage_with_complaint(char* complaint);
-void print_generic_usage(bool in_error);
-void print_specific_usage(enum e_command command, bool in_error);
-bool streq(char* str1, char* str2);
-bool strstartswith(char* str, char* pre);
-bool str_to_uint_safe(char* str, unsigned int* out);
+typedef const char* const immutable_string_t;
 
-void str_scanf_escape(char* str, char* out);
+unsigned int mod_pow(unsigned long base, unsigned int exp, const unsigned int mod);
+
+void print_generic_usage_with_complaint_and_readback_short_option(immutable_string_t complaint, const char option_name);
+void print_generic_usage_with_complaint_and_readback_string(immutable_string_t complaint, immutable_string_t content);
+void print_generic_usage_with_complaint(immutable_string_t complaint);
+void print_generic_usage(const bool in_error);
+void print_specific_usage(const enum e_command command, const bool in_error);
+bool streq(immutable_string_t str1, immutable_string_t str2);
+bool strstartswith(const char* str, const char* pre);
+bool str_to_uint_safe(immutable_string_t str, unsigned int* const out);
+
+void str_scanf_escape(const char* str, char* out);
 
 #endif
