@@ -245,6 +245,14 @@ void print_specific_usage(enum e_command command, bool in_error) {
 bool streq(char* str1, char* str2) {
 	return strcmp(str1, str2) == 0;
 }
+bool strstartswith(char* str, char* pre) {
+	while(*pre != '\0') { // prefix still has chars
+		if(*pre != *str) return false;
+		pre += sizeof(char);
+		str += sizeof(char);
+	}
+	return true;
+}
 bool str_to_uint_safe(char* str, unsigned int* out) {
 	char* nonnumber_chars;
 	unsigned long result = strtoul(str, &nonnumber_chars, 0);
@@ -252,4 +260,11 @@ bool str_to_uint_safe(char* str, unsigned int* out) {
 	if (strlen(nonnumber_chars) != 0) return false; // if there are extraneous characters, the number was invalid.
 	*out = (unsigned int)result;
 	return true;
+}
+
+void str_scanf_escape(char* str, char* out) { // out should be 2x strlen of str, to be safe
+	for (size_t i = 0; *str != '\0'; str += sizeof(char), i++) {
+		out[i] = *str;
+		if (*str == '%') out[++i] = '%';
+	}
 }

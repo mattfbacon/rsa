@@ -45,6 +45,9 @@ void print_generic_usage_with_complaint(char* complaint);
 void print_generic_usage(bool in_error);
 void print_specific_usage(enum e_command command, bool in_error);
 bool streq(char* str1, char* str2);
+bool strstartswith(char* str, char* pre);
 bool str_to_uint_safe(char* str, unsigned int* out);
+
+void str_scanf_escape(char* str, char* out);
 
 #endif
