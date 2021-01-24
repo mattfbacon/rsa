@@ -244,7 +244,7 @@ void print_specific_usage(const enum e_command command, const bool in_error) {
 bool streq(immutable_string_t str1, immutable_string_t str2) {
 	return strcmp(str1, str2) == 0;
 }
-bool strstartswith(const char* str, const char* pre) {
+bool strstartswith(const char*restrict str, const char*restrict pre) {
 	for(; *pre != '\0'; pre += sizeof(char), str += sizeof(char)) { // prefix still has chars
 		if(*pre != *str) return false;
 	}
@@ -259,7 +259,7 @@ bool str_to_uint_safe(immutable_string_t str, unsigned int* const out) {
 	return true;
 }
 
-void str_scanf_escape(const char* str, char* out) { // out should be 2x strlen of str, to be safe
+void str_scanf_escape(const char*restrict str, char*restrict out) { // out should be 2x strlen of str, to be safe
 	for (size_t i = 0; *str != '\0'; str += sizeof(char), i++) {
 		out[i] = *str;
 		if (*str == '%') out[++i] = '%';

@@ -37,7 +37,7 @@ enum e_command {
 	KEYGEN
 };
 
-typedef const char* const immutable_string_t;
+typedef const char*restrict const immutable_string_t;
 
 unsigned int mod_pow(unsigned long base, unsigned int exp, const unsigned int mod);
 
@@ -47,9 +47,9 @@ void print_generic_usage_with_complaint(immutable_string_t complaint);
 void print_generic_usage(const bool in_error);
 void print_specific_usage(const enum e_command command, const bool in_error);
 bool streq(immutable_string_t str1, immutable_string_t str2);
-bool strstartswith(const char* str, const char* pre);
+bool strstartswith(const char*restrict str, const char*restrict pre);
 bool str_to_uint_safe(immutable_string_t str, unsigned int* const out);
 
-void str_scanf_escape(const char* str, char* out);
+void str_scanf_escape(const char*restrict str, char*restrict out);
 
 #endif
