@@ -20,39 +20,53 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 #include <math.h>
 #include "util.h"
 #include "rsa.h"
 #include "main.h"
 
 bool get_prime(unsigned int *result) {
+	verbose_log("getting a prime\n");
 	for (unsigned short r = GET_PRIME_TRIES; r > 0; r -= 1) {
 		unsigned int n = get_number_in_prime_range();
+		verbose_logf("got %u which was...\n", n);
 		if (is_prime(n)) {
+			verbose_log("...prime, so returning it\n");
 			*result = n;
 			return true;
 		}
+		verbose_log("...probably not prime\n");
 	}
 	return false;
 }
 
 unsigned int rsa_encrypt(char plain, unsigned int key, unsigned int modulus) {
+	verbose_logf(isprint(plain) ? "encrypting %c with %u %% %u\n" : "encrypting non-print (hex %02x) with %u %% %u\n", plain, key, modulus);
 	return mod_pow((unsigned long)plain, key, modulus);
 }
 
 char rsa_decrypt(unsigned int cipher, unsigned int key, unsigned int modulus) {
+	verbose_logf("decrypting %u with %u %% %u\n", cipher, key, modulus);
 	return (char)mod_pow(cipher, key, modulus);
 }
 
 void rsa_keygen(struct KeygenResult* result) {
+	verbose_log("generating keys\n");
 	get_prime(&(result->p));
+	verbose_logf("got p %u\n", result->p);
 	do {
 		get_prime(&(result->q));
+		verbose_logf("trying q %u\n", result->q);
 	} while(result->p == result->q);
+	verbose_logf("final q was %u\n", result->q);
 	result->modulo = result->p * result->q;
+	verbose_logf("modulus is %u\n", result->modulo);
 	const unsigned int totient = (result->p - 1) * (result->q - 1);
+	verbose_logf("totient is %u\n", totient);
 	do {
 		result->public = randrange(1, totient);
+		verbose_logf("trying public key %u\n", result->public);
 	} while (gcd(result->public, totient) != 1);
 
 	result->private = multiplicative_inverse(result->public, totient);

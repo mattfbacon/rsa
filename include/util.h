@@ -31,11 +31,23 @@ bool is_prime(unsigned int n);
 unsigned int gcd(unsigned int a, unsigned int b);
 unsigned int multiplicative_inverse(unsigned int a, unsigned int b);
 
+enum e_command {
+	ENCRYPT,
+	DECRYPT,
+	KEYGEN
+};
+
 unsigned int mod_pow(unsigned long base, unsigned int exp, unsigned int mod);
 unsigned int get_random(unsigned int max);
+void print_generic_usage_with_complaint_and_readback_short_option(char* complaint, char option_name);
+void print_generic_usage_with_complaint_and_readback_string(char* complaint, char* content);
 void print_generic_usage_with_complaint(char* complaint);
-void print_generic_usage();
+void print_generic_usage(bool in_error);
+void print_specific_usage(enum e_command command, bool in_error);
 bool streq(char* str1, char* str2);
+bool strstartswith(char* str, char* pre);
 bool str_to_uint_safe(char* str, unsigned int* out);
+
+void str_scanf_escape(char* str, char* out);
 
 #endif

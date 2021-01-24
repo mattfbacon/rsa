@@ -23,4 +23,22 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 #define EXIT_INTERNAL_ERROR 1
 #define EXIT_EOF_INPUT 0
 
+#define VERSION_STRING "rsa, by Matt Fellenz\nversion 0.2-alpha\nlicensed under the GPL v3.0"
+
+enum e_verbosity {
+	VERBOSE,
+	DEFAULT,
+	QUIET
+};
+
+extern enum e_verbosity verbosity;
+
+#define verbose_logf(...) if (__builtin_expect(verbosity == VERBOSE, 0)) fprintf(stderr, __VA_ARGS__);
+#define verbose_log(str) if (__builtin_expect(verbosity == VERBOSE, 0)) fputs(str, stderr);
+
+enum e_data_format {
+	NUMBERS,
+	CHARS
+};
+
 #endif
