@@ -28,7 +28,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 enum e_verbosity verbosity = DEFAULT;
 
-int main(int argc, char** argv) {
+int main(const int argc, const char*const*const argv) {
 	/* -v, --verbose : set verbosity to VERBOSE
 	   -b, --brief : set verbosity to DEFAULT (only useful after -v or -q)
 	   -q, --quiet : set verbosity to QUIET
@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
 	enum e_data_format data_format = CHARS;
 	char* delimiter = " ";
 	for (int arg_pos = 1; arg_pos < argc; arg_pos++) {
-		char* this_arg = argv[arg_pos];
+		const char* this_arg = argv[arg_pos];
 		if (this_arg[0] == '-') { // starts with -, short or long option (or just - or --)
 			if (this_arg[1] == '-') { // starts with --, long option (or just --)
 				if (this_arg[2] == '\0') { // just --, disqualifies anything following as an argument
@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
 					else if (streq(this_arg, "version")) { puts(VERSION_STRING); exit(0); }
 					else if (streq(this_arg, "help") || streq(this_arg, "usage")) wants_help = true;
 					else {
-						bool was_format = streq(this_arg, "format");
+						const bool was_format = streq(this_arg, "format");
 						if (was_format || streq(this_arg, "delimiter")) {
 							if (arg_pos + 1 >= argc) print_generic_usage_with_complaint_and_readback_string("argument required for option", this_arg - 2 * sizeof(char)); // off-by-one? couldn't be me
 							this_arg = argv[++arg_pos];
@@ -99,7 +99,7 @@ int main(int argc, char** argv) {
 								this_arg = argv[++arg_pos];
 								if (this_arg[0] == '-') print_generic_usage_with_complaint("argument required for option '-f'"); // it's not the argument, it's another option
 							} // else, e.g., -fchars, so just use the rest of this_arg.
-							bool was_chars = strstartswith(this_arg, "chars");
+							const bool was_chars = strstartswith(this_arg, "chars");
 							if (was_chars || strstartswith(this_arg, "numbers")) {
 								data_format = was_chars ? CHARS : NUMBERS;
 								this_arg += was_chars ? strlen("chars") : strlen("numbers");
@@ -148,7 +148,7 @@ int main(int argc, char** argv) {
 			rsa_keygen(&result);
 			printf(verbosity == QUIET ? "%u\n%u\n%u\n" : "public key: %u\nprivate key: %u\nmodulus: %u\n", result.public, result.private, result.modulo);
 		} else {
-			bool are_encrypting = streq(text_args[0], "encrypt");
+			const bool are_encrypting = streq(text_args[0], "encrypt");
 			if (are_encrypting || streq(text_args[0], "decrypt")) {
 				if (__builtin_expect(wants_help, 0)) print_specific_usage(are_encrypting ? ENCRYPT : DECRYPT, false);
 				verbose_log("encrypting or decrypting\n");
@@ -165,7 +165,7 @@ int main(int argc, char** argv) {
 					print_specific_usage(are_encrypting ? ENCRYPT : DECRYPT, true);
 				verbose_logf("got modulus %u\n", mod);
 
-				bool from_stdin = streq(text_args[3], "-");
+				const bool from_stdin = streq(text_args[3], "-");
 				if (are_encrypting) {
 					verbose_log("encrypting ");
 					if (from_stdin) {
@@ -197,7 +197,7 @@ int main(int argc, char** argv) {
 					exit(EXIT_SUCCESS);
 				} else { // decrypting
 					verbose_log("decrypting ");
-					char escaped_delimiter[2 * strlen(delimiter)];
+					char escaped_delimiter[2 * strlen(delimiter) + 1];
 					str_scanf_escape(delimiter, escaped_delimiter);
 					if (from_stdin) {
 						verbose_log("from stdin\n");
@@ -228,7 +228,7 @@ int main(int argc, char** argv) {
 						strcat(full_scanf_string, escaped_delimiter);
 						strcat(full_scanf_string, "%n");
 						unsigned int parsed;
-						char* end_ptr = text_args[3] + sizeof(char) * strlen(text_args[3]);
+						const char* end_ptr = text_args[3] + sizeof(char) * strlen(text_args[3]);
 						int chars_consumed;
 						for (char* current_char_ptr = text_args[3]; current_char_ptr < end_ptr; current_char_ptr += chars_consumed) {
 							if (sscanf(current_char_ptr, full_scanf_string, &parsed, &chars_consumed) == 0) {

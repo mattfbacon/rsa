@@ -26,10 +26,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 #include "rsa.h"
 #include "main.h"
 
-bool get_prime(unsigned int *result) {
+bool get_prime(unsigned int* const result) {
 	verbose_log("getting a prime\n");
-	for (unsigned short r = GET_PRIME_TRIES; r > 0; r -= 1) {
-		unsigned int n = get_number_in_prime_range();
+	for (unsigned short r = GET_PRIME_TRIES; r > 0; r --) {
+		const unsigned int n = get_number_in_prime_range();
 		verbose_logf("got %u which was...\n", n);
 		if (is_prime(n)) {
 			verbose_log("...prime, so returning it\n");
@@ -41,17 +41,17 @@ bool get_prime(unsigned int *result) {
 	return false;
 }
 
-unsigned int rsa_encrypt(char plain, unsigned int key, unsigned int modulus) {
+unsigned int rsa_encrypt(const char plain, const unsigned int key, const unsigned int modulus) {
 	verbose_logf(isprint(plain) ? "encrypting %c with %u %% %u\n" : "encrypting non-print (hex %02x) with %u %% %u\n", plain, key, modulus);
 	return mod_pow((unsigned long)plain, key, modulus);
 }
 
-char rsa_decrypt(unsigned int cipher, unsigned int key, unsigned int modulus) {
+char rsa_decrypt(const unsigned int cipher, const unsigned int key, const unsigned int modulus) {
 	verbose_logf("decrypting %u with %u %% %u\n", cipher, key, modulus);
 	return (char)mod_pow(cipher, key, modulus);
 }
 
-void rsa_keygen(struct KeygenResult* result) {
+void rsa_keygen(struct KeygenResult* const result) {
 	verbose_log("generating keys\n");
 	get_prime(&(result->p));
 	verbose_logf("got p %u\n", result->p);
