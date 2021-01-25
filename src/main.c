@@ -197,7 +197,7 @@ int main(const int argc, const char*const*const argv) {
 					exit(EXIT_SUCCESS);
 				} else { // decrypting
 					verbose_log("decrypting ");
-					char escaped_delimiter[2 * strlen(delimiter)];
+					char escaped_delimiter[2 * strlen(delimiter) + 1];
 					str_scanf_escape(delimiter, escaped_delimiter);
 					if (from_stdin) {
 						verbose_log("from stdin\n");
