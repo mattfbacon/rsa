@@ -27,16 +27,16 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 #include "main.h"
 
 static const unsigned short low_primes[] = {
-	3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,
-	97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,
-	179,181,191,193,197,199,211,223,227,229,233,239,241,251,257,263,
-	269,271,277,281,283,293,307,311,313,317,331,337,347,349,353,359,
-	367,373,379,383,389,397,401,409,419,421,431,433,439,443,449,457,
-	461,463,467,479,487,491,499,503,509,521,523,541,547,557,563,569,
-	571,577,587,593,599,601,607,613,617,619,631,641,643,647,653,659,
-	661,673,677,683,691,701,709,719,727,733,739,743,751,757,761,769,
-	773,787,797,809,811,821,823,827,829,839,853,857,859,863,877,881,
-	883,887,907,911,919,929,937,941,947,953,967,971,977,983,991,997
+	3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89,
+	97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173,
+	179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263,
+	269, 271, 277, 281, 283, 293, 307, 311, 313, 317, 331, 337, 347, 349, 353, 359,
+	367, 373, 379, 383, 389, 397, 401, 409, 419, 421, 431, 433, 439, 443, 449, 457,
+	461, 463, 467, 479, 487, 491, 499, 503, 509, 521, 523, 541, 547, 557, 563, 569,
+	571, 577, 587, 593, 599, 601, 607, 613, 617, 619, 631, 641, 643, 647, 653, 659,
+	661, 673, 677, 683, 691, 701, 709, 719, 727, 733, 739, 743, 751, 757, 761, 769,
+	773, 787, 797, 809, 811, 821, 823, 827, 829, 839, 853, 857, 859, 863, 877, 881,
+	883, 887, 907, 911, 919, 929, 937, 941, 947, 953, 967, 971, 977, 983, 991, 997
 };
 
 static const unsigned char num_low_primes = 167;
@@ -49,7 +49,7 @@ unsigned int get_random(const unsigned int max) {
 
 	do {
 		fread(&r, sizeof(r), 1, f);
-	} while(r >= limit);
+	} while (r >= limit);
 
 	fclose(f);
 
@@ -71,8 +71,8 @@ unsigned int gcd(unsigned int a, unsigned int b) {
 
 unsigned int multiplicative_inverse(unsigned int a, unsigned int b) {
 	verbose_logf("getting multiplicative inverse of %u and %u\n", a, b);
-	#pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored "-Wsign-conversion"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
 	unsigned int x = 0, y = 1, oa = a, ob = b;
 	int lx = 1, ly = 0;
 	while (b != 0) {
@@ -91,7 +91,7 @@ unsigned int multiplicative_inverse(unsigned int a, unsigned int b) {
 	if (lx < 0) lx += ob;
 	if (ly < 0) ly += oa;
 	return lx; // where ia + jb = gdb(a, b), return i.
-	#pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
 }
 
 bool rabin_miller_check(unsigned int base, const unsigned int limit, const unsigned int exp, const unsigned int modulus) {
@@ -121,7 +121,7 @@ bool rabin_miller(const unsigned int n) {
 	for (unsigned int i = 1; i < RABIN_MILLER_TRIES; i++) {
 		verbose_logf("  iterate: ");
 		const unsigned int base = randrange(2, n - 1);
-		if(!rabin_miller_check(base, limit, exp, n)) return false;
+		if (!rabin_miller_check(base, limit, exp, n)) return false;
 	}
 	return true;
 }
@@ -199,7 +199,7 @@ void print_generic_usage(const bool in_error) {
 	exit(in_error ? EXIT_USAGE_ERROR : EXIT_SUCCESS);
 }
 void print_specific_usage(const enum e_command command, const bool in_error) {
-	switch(command) {
+	switch (command) {
 		case ENCRYPT:
 			fputs(
 				"HELP WITH encrypt:\n"
@@ -244,9 +244,9 @@ void print_specific_usage(const enum e_command command, const bool in_error) {
 bool streq(immutable_string_t str1, immutable_string_t str2) {
 	return strcmp(str1, str2) == 0;
 }
-bool strstartswith(const char*restrict str, const char*restrict pre) {
-	for(; *pre != '\0'; pre += sizeof(char), str += sizeof(char)) { // prefix still has chars
-		if(*pre != *str) return false;
+bool strstartswith(const char* restrict str, const char* restrict pre) {
+	for (; *pre != '\0'; pre += sizeof(char), str += sizeof(char)) { // prefix still has chars
+		if (*pre != *str) return false;
 	}
 	return true;
 }
@@ -259,7 +259,7 @@ bool str_to_uint_safe(immutable_string_t str, unsigned int* const out) {
 	return true;
 }
 
-void str_scanf_escape(const char*restrict str, char*restrict out) { // out should be 2x strlen of str, to be safe
+void str_scanf_escape(const char* restrict str, char* restrict out) { // out should be 2x strlen of str, to be safe
 	for (size_t i = 0; *str != '\0'; str += sizeof(char), i++) {
 		out[i] = *str;
 		if (*str == '%') out[++i] = '%';

@@ -58,7 +58,7 @@ void rsa_keygen(struct KeygenResult* const result) {
 	do {
 		get_prime(&(result->q));
 		verbose_logf("trying q %u\n", result->q);
-	} while(result->p == result->q);
+	} while (result->p == result->q);
 	verbose_logf("final q was %u\n", result->q);
 	result->modulo = result->p * result->q;
 	verbose_logf("modulus is %u\n", result->modulo);

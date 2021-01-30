@@ -28,7 +28,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 enum e_verbosity verbosity = DEFAULT;
 
-int main(const int argc, const char*const*const argv) {
+int main(const int argc, const char* const* const argv) {
 	/* -v, --verbose : set verbosity to VERBOSE
 	   -b, --brief : set verbosity to DEFAULT (only useful after -v or -q)
 	   -q, --quiet : set verbosity to QUIET
@@ -84,7 +84,7 @@ int main(const int argc, const char*const*const argv) {
 				continue;
 			} else { // short option(s)
 				this_arg += sizeof(char); // exclude - prefix
-				for(; this_arg[0] != '\0'; this_arg += sizeof(char)) { // process while this_arg still has characters
+				for (; this_arg[0] != '\0'; this_arg += sizeof(char)) { // process while this_arg still has characters
 					switch (this_arg[0]) {
 						case 'v': verbosity = VERBOSE; break;
 						case 'b': verbosity = DEFAULT; break;
@@ -125,16 +125,16 @@ int main(const int argc, const char*const*const argv) {
 						default: print_generic_usage_with_complaint_and_readback_short_option("unrecognized option", this_arg[0]); // exits
 					}
 				}
-				loop_exit: ;
+			loop_exit: ;
 			}
 		} else { // normal argument
-		if (text_arg_index == 5) continue; // ignore extra arguments
+			if (text_arg_index == 5) continue; // ignore extra arguments
 			text_args[text_arg_index] = this_arg;
 			text_arg_index++;
 			continue; // redundant
 		}
 	}
-	for(char* i = delimiter; *i != '\0'; i += sizeof(char)) {
+	for (char* i = delimiter; *i != '\0'; i += sizeof(char)) {
 		if (isdigit(*i)) {
 			print_generic_usage_with_complaint_and_readback_string("delimiter cannot include digits; got", delimiter);
 		}
@@ -156,12 +156,12 @@ int main(const int argc, const char*const*const argv) {
 					print_specific_usage(are_encrypting ? ENCRYPT : DECRYPT, true);
 				}
 				unsigned int key;
-				if(!str_to_uint_safe(text_args[1], &key))
+				if (!str_to_uint_safe(text_args[1], &key))
 					print_specific_usage(are_encrypting ? ENCRYPT : DECRYPT, true);
 				verbose_logf("got key %u\n", key);
 
 				unsigned int mod;
-				if(!str_to_uint_safe(text_args[2], &mod))
+				if (!str_to_uint_safe(text_args[2], &mod))
 					print_specific_usage(are_encrypting ? ENCRYPT : DECRYPT, true);
 				verbose_logf("got modulus %u\n", mod);
 
@@ -244,7 +244,7 @@ int main(const int argc, const char*const*const argv) {
 								print_specific_usage(DECRYPT, true);
 							}
 							if (chars_consumed == 0) { // might be last character, so try
-								if(sscanf(current_char_ptr, "%u%n", &parsed, &chars_consumed) == 0) {
+								if (sscanf(current_char_ptr, "%u%n", &parsed, &chars_consumed) == 0) {
 									fputs("got invalid ciphertext number, i.e., was not a number\n", stderr);
 									print_specific_usage(DECRYPT, true);
 								} else is_last = true;
@@ -261,7 +261,7 @@ int main(const int argc, const char*const*const argv) {
 							} else putchar(rsa_decrypt(parsed, key, mod));
 						}
 					}
-					if(are_encrypting) putchar('\n');
+					if (are_encrypting) putchar('\n');
 				}
 			} else {
 				print_generic_usage_with_complaint_and_readback_string("unknown action", text_args[0]);

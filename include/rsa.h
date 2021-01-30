@@ -34,7 +34,7 @@ struct KeygenResult {
 	unsigned int q;
 };
 
-bool get_prime(unsigned int *result);
+bool get_prime(unsigned int* result);
 unsigned int rsa_encrypt(char plain, unsigned int key, unsigned int modulus);
 char rsa_decrypt(unsigned int cipher, unsigned int key, unsigned int modulus);
 void rsa_keygen(struct KeygenResult* result);
