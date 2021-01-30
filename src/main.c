@@ -166,8 +166,8 @@ int main(const int argc, const char*const*const argv) {
 				verbose_logf("got modulus %u\n", mod);
 
 				const bool from_stdin = streq(text_args[3], "-");
-				if (are_encrypting) {
-					verbose_log("encrypting ");
+				if (are_encrypting && data_format == CHARS) {
+					verbose_log("encrypting in fchars ");
 					if (from_stdin) {
 						verbose_log("from stdin\n");
 						int first, second = getchar();
@@ -195,8 +195,8 @@ int main(const int argc, const char*const*const argv) {
 					}
 					putchar('\n'); // customary newline on output
 					exit(EXIT_SUCCESS);
-				} else { // decrypting
-					verbose_log("decrypting ");
+				} else { // decrypting, or encrypting from numbers
+					verbose_log(are_encrypting ? "decrypting " : "encrypting in fnumbers ");
 					char escaped_delimiter[2 * strlen(delimiter) + 1];
 					str_scanf_escape(delimiter, escaped_delimiter);
 					if (from_stdin) {
@@ -208,6 +208,7 @@ int main(const int argc, const char*const*const argv) {
 							exit(EXIT_EOF_INPUT);
 						}
 						scanf(escaped_delimiter);
+						bool is_not_first = false;
 						while (scan_result != EOF) {
 							if (scan_result == 0) {
 								fputs("got invalid ciphertext number, i.e., was not a number\n", stderr);
@@ -217,7 +218,12 @@ int main(const int argc, const char*const*const argv) {
 								perror("OS error");
 								exit(EXIT_INTERNAL_ERROR);
 							}
-							putchar(rsa_decrypt(parsed, key, mod));
+							if (are_encrypting) {
+								if (is_not_first) {
+									fputs(delimiter, stdout);
+								} else is_not_first = true;
+								printf("%u", mod_pow(parsed, key, mod));
+							} else putchar(rsa_decrypt(parsed, key, mod));
 							scan_result = scanf("%u", &parsed);
 							scanf(escaped_delimiter);
 						}
@@ -230,14 +236,32 @@ int main(const int argc, const char*const*const argv) {
 						unsigned int parsed;
 						const char* end_ptr = text_args[3] + sizeof(char) * strlen(text_args[3]);
 						int chars_consumed;
+						bool is_not_first = false;
+						bool is_last = false;
 						for (char* current_char_ptr = text_args[3]; current_char_ptr < end_ptr; current_char_ptr += chars_consumed) {
 							if (sscanf(current_char_ptr, full_scanf_string, &parsed, &chars_consumed) == 0) {
 								fputs("got invalid ciphertext number, i.e., was not a number\n", stderr);
 								print_specific_usage(DECRYPT, true);
 							}
-							putchar(rsa_decrypt(parsed, key, mod));
+							if (chars_consumed == 0) { // might be last character, so try
+								if(sscanf(current_char_ptr, "%u%n", &parsed, &chars_consumed) == 0) {
+									fputs("got invalid ciphertext number, i.e., was not a number\n", stderr);
+									print_specific_usage(DECRYPT, true);
+								} else is_last = true;
+							}
+							if (are_encrypting) {
+								if (is_not_first) {
+									fputs(delimiter, stdout);
+								} else is_not_first = true;
+								printf("%u", mod_pow(parsed, key, mod));
+								if (is_last && current_char_ptr + chars_consumed != end_ptr) {
+									fputs("got invalid ciphertext number, i.e., was not a number\n", stderr);
+									print_specific_usage(DECRYPT, true);
+								}
+							} else putchar(rsa_decrypt(parsed, key, mod));
 						}
 					}
+					if(are_encrypting) putchar('\n');
 				}
 			} else {
 				print_generic_usage_with_complaint_and_readback_string("unknown action", text_args[0]);
