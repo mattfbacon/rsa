@@ -52,7 +52,7 @@ int main(const int argc, const char* const* const argv) {
 					// copy item-by-item to text_args the following arguments until end of argc
 					// if there are too many arguments to fit into text_args, ignore them because there are too many anyway (max 3).
 					for (; arg_pos < argc && text_arg_index < 5; text_arg_index++, arg_pos++) {
-						text_args[text_arg_index] = argv[arg_pos];
+						text_args[text_arg_index] = (char*)argv[arg_pos];
 					}
 					break;
 				} else { // long option
@@ -72,14 +72,14 @@ int main(const int argc, const char* const* const argv) {
 								else if (streq(this_arg, "chars")) data_format = CHARS;
 								else print_generic_usage_with_complaint_and_readback_string("unknown argument to option '--format'", this_arg);
 							} else { // delimiter
-								delimiter = this_arg;
+								delimiter = (char*)this_arg;
 							}
 						} else print_generic_usage_with_complaint_and_readback_string("unrecognized option", this_arg - (2 * sizeof(char)));
 					}
 					continue; // redundant
 				}
 			} else if (this_arg[1] == '\0') { // just -, not actually an option
-				text_args[text_arg_index] = this_arg;
+				text_args[text_arg_index] = (char*)this_arg;
 				text_arg_index++;
 				continue;
 			} else { // short option(s)
@@ -120,7 +120,7 @@ int main(const int argc, const char* const* const argv) {
 								this_arg = argv[++arg_pos];
 								// to allow for a dash delimiter, the next argv item is treated as -d's argument whether or not it starts with a dash.
 							} // else, the delimiter is the rest of the string (e.g., -d', '), so don't touch this_arg
-							delimiter = this_arg;
+							delimiter = (char*)this_arg;
 							goto loop_exit; // no one asked you if goto is bad
 						default: print_generic_usage_with_complaint_and_readback_short_option("unrecognized option", this_arg[0]); // exits
 					}
@@ -129,7 +129,7 @@ int main(const int argc, const char* const* const argv) {
 			}
 		} else { // normal argument
 			if (text_arg_index == 5) continue; // ignore extra arguments
-			text_args[text_arg_index] = this_arg;
+			text_args[text_arg_index] = (char*)this_arg;
 			text_arg_index++;
 			continue; // redundant
 		}
