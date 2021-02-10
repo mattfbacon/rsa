@@ -33,8 +33,8 @@ enum e_verbosity {
 
 extern enum e_verbosity verbosity;
 
-#define verbose_logf(...) if (__builtin_expect(verbosity == VERBOSE, 0)) fprintf(stderr, __VA_ARGS__);
-#define verbose_log(str) if (__builtin_expect(verbosity == VERBOSE, 0)) fputs(str, stderr);
+#define verbose_logf(...) if (__builtin_expect(verbosity == VERBOSE, 0)) fprintf(stderr, __VA_ARGS__)
+#define verbose_log(str) if (__builtin_expect(verbosity == VERBOSE, 0)) fputs((str), stderr)
 
 enum e_data_format {
 	NUMBERS,
