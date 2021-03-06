@@ -16,9 +16,11 @@ _OBJS=util.o rsa.o
 OBJS=$(patsubst %,$(ODIR)/%,$(_OBJS))
 
 $(ODIR)/%.o: $(SDIR)/%.c $(INCLUDES)
+	mkdir -p $(ODIR)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(TARGET): $(OBJS)
+	mkdir -p $(OUTDIR)
 	$(CC) $(CFLAGS) -o $(OUTDIR)/$@ $(SDIR)/main.c $(OBJS)
 
 clean:
