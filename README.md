@@ -2,6 +2,8 @@
 
 A simple implementation of RSA encryption and decryption, as well as key generation with small primes (8 bits).
 
+Note: before you get mad at me, I know this is not actually RSA. It was just a way to learn C.
+
 ## Building/Installation
 
 Due to the use of `/dev/urandom`, **this will only run on Linux!** A port to other operating systems is trivial and thus is left as an exercise to the user (or just run Linux).
